@@ -187,7 +187,7 @@ export default function TaskList({
                     <Tooltip title="Delete task">
                       <span>
                         <IconButton
-                          color="error"
+                          color="primary"
                           // disabled={task.status === "COMPLETED"}
                           onClick={() => handleDeleteClick(task._id!)}
                         >
