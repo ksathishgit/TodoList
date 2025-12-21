@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Typography,
   Tooltip,
+  Link,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import EditTask from "./EditTask";
@@ -24,6 +25,7 @@ import {
 import { toast } from "react-toastify";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ConfirmDialog from "../components/ConfirmationDialog";
 
 interface Props {
   tasks: Task[];
@@ -41,34 +43,63 @@ export default function TaskList({
   onTaskUpdated,
 }: Props) {
   const [editTask, setEditTask] = useState<Task | null>(null);
+  const [updatingTaskName, setUpdatingTaskName] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    title: string;
+    description: string;
+    onConfirm: () => void;
+  } | null>(null);
 
-  const handleDelete = async (taskId: string) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this task?"
-    );
+  const [actionLoading, setActionLoading] = useState(false);
 
-    if (!confirmed) return;
+  const handleDeleteClick = (taskId: string) => {
+    setConfirmConfig({
+      title: "Delete Task",
+      description: "Are you sure you want to delete this task?",
+      onConfirm: () => confirmDelete(taskId),
+    });
+    setConfirmOpen(true);
+  };
 
+  const confirmDelete = async (taskId: string) => {
     try {
+      setActionLoading(true);
       await deleteTaskById(taskId);
       toast.success("Task deleted successfully");
-    } catch {
-      toast.error("Failed to delete task");
+      onTaskUpdated();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to delete task");
+    } finally {
+      setActionLoading(false);
+      setConfirmOpen(false);
     }
   };
 
-  const handleStatusUpdate = async (
-    taskName: string,
-    status: "PENDING" | "COMPLETED"
-  ) => {
+  const handleStatusClick = (taskName: string, status: "COMPLETED") => {
+    setConfirmConfig({
+      title: "Update Task Status",
+      description: `Are you sure you want to mark this task as ${status}?`,
+      onConfirm: () => confirmStatusUpdate(taskName, status),
+    });
+    setConfirmOpen(true);
+  };
+
+  const confirmStatusUpdate = async (taskName: string, status: "COMPLETED") => {
     try {
+      setActionLoading(true);
+      setUpdatingTaskName(taskName);
+
       await updateTaskStatusByName(taskName, status);
+
       toast.success(`Task marked as ${status}`);
-      // onTaskUpdated();
+      onTaskUpdated();
     } catch (error: any) {
-      toast.error(
-        error?.response?.data?.message || "Failed to update task status"
-      );
+      toast.error(error?.response?.data?.message || "Failed to update status");
+    } finally {
+      setActionLoading(false);
+      setUpdatingTaskName(null);
+      setConfirmOpen(false);
     }
   };
 
@@ -80,7 +111,7 @@ export default function TaskList({
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell>Status</TableCell>
+              <TableCell align="center">Status</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -106,23 +137,26 @@ export default function TaskList({
               tasks.map((task) => (
                 <TableRow key={task._id}>
                   <TableCell>{task.taskName}</TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     {task.status}
-                    <Tooltip title="Mark as Completed">
-                      <span>
-                        <IconButton
-                          size="small"
-                          color="success"
-                          disabled={task.status === "COMPLETED"}
-                          onClick={() => {
-                            handleStatusUpdate(task.taskName, "COMPLETED");
-                            onTaskUpdated();
-                          }}
-                        >
-                          <CheckCircleIcon />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
+                    {task.status !== "COMPLETED" && (
+                      <div className="todo-status-action">
+                        {updatingTaskName === task.taskName ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <Link
+                            component="button"
+                            underline="hover"
+                            className="todo-status-link"
+                            onClick={() =>
+                              handleStatusClick(task.taskName, "COMPLETED")
+                            }
+                          >
+                            Mark as complete
+                          </Link>
+                        )}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell align="center">
                     <Tooltip title="View task">
@@ -155,7 +189,7 @@ export default function TaskList({
                         <IconButton
                           color="error"
                           // disabled={task.status === "COMPLETED"}
-                          onClick={() => handleDelete(task._id!)}
+                          onClick={() => handleDeleteClick(task._id!)}
                         >
                           <DeleteIcon />
                         </IconButton>
@@ -175,6 +209,16 @@ export default function TaskList({
             setEditTask(null);
           }}
           onCancel={() => setEditTask(null)}
+        />
+      )}
+      {confirmConfig && (
+        <ConfirmDialog
+          open={confirmOpen}
+          title={confirmConfig.title}
+          description={confirmConfig.description}
+          loading={actionLoading}
+          onConfirm={confirmConfig.onConfirm}
+          onCancel={() => setConfirmOpen(false)}
         />
       )}
     </Paper>

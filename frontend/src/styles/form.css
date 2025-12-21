@@ -80,3 +80,24 @@
     color: #757575;
     padding: 20px;
 }
+
+.todo-status-action {
+    font-size: 13px;
+}
+
+.todo-status-link {
+    color: #1976d2;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.todo-status-link:hover {
+    text-decoration: underline;
+}
+
+.todo-status-completed {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2e7d32;
+}
