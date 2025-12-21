@@ -24,8 +24,7 @@ import {
 } from "../controllers/taskController";
 import { toast } from "react-toastify";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ConfirmDialog from "../components/ConfirmationDialog";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 interface Props {
   tasks: Task[];
@@ -161,6 +160,7 @@ export default function TaskList({
                   <TableCell align="center">
                     <Tooltip title="View task">
                       <IconButton
+                        aria-label="view-task"
                         color="info"
                         onClick={() => onViewTask(task.taskName)}
                       >
@@ -177,6 +177,7 @@ export default function TaskList({
                       <span>
                         <IconButton
                           color="primary"
+                          aria-label="edit-task"
                           disabled={task.status === "COMPLETED"}
                           onClick={() => onEditTask(task._id, task)}
                         >
@@ -188,6 +189,7 @@ export default function TaskList({
                       <span>
                         <IconButton
                           color="primary"
+                          aria-label="delete-task"
                           // disabled={task.status === "COMPLETED"}
                           onClick={() => handleDeleteClick(task._id!)}
                         >

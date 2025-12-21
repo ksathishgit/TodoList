@@ -10,6 +10,14 @@ export interface Task {
   effort: number;
 }
 
+export type TaskField =
+  | "taskName"
+  | "description"
+  | "startDate"
+  | "endDate"
+  | "status"
+  | "effort";
+
 export interface TaskFormType {
   taskName: string;
   description: string;
