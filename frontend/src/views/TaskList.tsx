@@ -17,15 +17,20 @@ import EditTask from "./EditTask";
 import { Task } from "../types/tasks";
 import "../styles/form.css";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { deleteTaskById } from "../controllers/taskController";
+import {
+  deleteTaskById,
+  updateTaskStatusByName,
+} from "../controllers/taskController";
 import { toast } from "react-toastify";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 interface Props {
   tasks: Task[];
   loading: boolean;
-  onEditTask: (task: Task) => void;
+  onEditTask: (taskId: string, task: Task) => void;
   onViewTask: (taskName: string) => void;
+  onTaskUpdated: () => void;
 }
 
 export default function TaskList({
@@ -33,6 +38,7 @@ export default function TaskList({
   loading,
   onEditTask,
   onViewTask,
+  onTaskUpdated,
 }: Props) {
   const [editTask, setEditTask] = useState<Task | null>(null);
 
@@ -48,6 +54,21 @@ export default function TaskList({
       toast.success("Task deleted successfully");
     } catch {
       toast.error("Failed to delete task");
+    }
+  };
+
+  const handleStatusUpdate = async (
+    taskName: string,
+    status: "PENDING" | "COMPLETED"
+  ) => {
+    try {
+      await updateTaskStatusByName(taskName, status);
+      toast.success(`Task marked as ${status}`);
+      // onTaskUpdated();
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message || "Failed to update task status"
+      );
     }
   };
 
@@ -85,7 +106,24 @@ export default function TaskList({
               tasks.map((task) => (
                 <TableRow key={task._id}>
                   <TableCell>{task.taskName}</TableCell>
-                  <TableCell>{task.status}</TableCell>
+                  <TableCell>
+                    {task.status}
+                    <Tooltip title="Mark as Completed">
+                      <span>
+                        <IconButton
+                          size="small"
+                          color="success"
+                          disabled={task.status === "COMPLETED"}
+                          onClick={() => {
+                            handleStatusUpdate(task.taskName, "COMPLETED");
+                            onTaskUpdated();
+                          }}
+                        >
+                          <CheckCircleIcon />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                  </TableCell>
                   <TableCell align="center">
                     <Tooltip title="View task">
                       <IconButton
@@ -95,7 +133,6 @@ export default function TaskList({
                         <VisibilityIcon />
                       </IconButton>
                     </Tooltip>
-
                     <Tooltip
                       title={
                         task.status === "COMPLETED"
@@ -107,7 +144,7 @@ export default function TaskList({
                         <IconButton
                           color="primary"
                           disabled={task.status === "COMPLETED"}
-                          onClick={() => onEditTask(task)}
+                          onClick={() => onEditTask(task._id, task)}
                         >
                           <EditIcon />
                         </IconButton>
@@ -132,7 +169,7 @@ export default function TaskList({
       </TableContainer>
       {editTask && (
         <EditTask
-          taskName={editTask.taskName!}
+          taskId={editTask._id}
           task={editTask}
           onUpdated={() => {
             setEditTask(null);

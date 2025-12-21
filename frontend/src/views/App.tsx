@@ -43,7 +43,7 @@ export default function App() {
     setSelectedTask(null);
   };
 
-  const handleEditClick = (task: Task) => {
+  const handleEditClick = (taskId: string, task: Task) => {
     setSelectedTask(task);
     setViewMode("EDIT");
   };
@@ -55,7 +55,6 @@ export default function App() {
 
   return (
     <div className="todo-container">
-      {/* Header */}
       <div className="todo-header">
         <h2>Todo List</h2>
 
@@ -65,14 +64,13 @@ export default function App() {
           </button>
         )}
       </div>
-
-      {/* View Switch */}
       {viewMode === "LIST" && (
         <TaskList
           tasks={tasks}
           loading={loading}
           onEditTask={handleEditClick}
           onViewTask={handleViewTask}
+          onTaskUpdated={fetchTasks}
         />
       )}
 
@@ -91,7 +89,7 @@ export default function App() {
 
       {viewMode === "EDIT" && selectedTask && (
         <EditTask
-          taskName={selectedTask.taskName!}
+          taskId={selectedTask._id!}
           task={selectedTask}
           onUpdated={() => {
             fetchTasks();

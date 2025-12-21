@@ -75,11 +75,6 @@ exports.deleteTask = async (req, res) => {
         message: "Task not found",
       });
     }
-    if (existingTask.status === "COMPLETED") {
-      return res.status(400).json({
-        message: "Completed tasks cannot be deleted",
-      });
-    }
     await Task.findByIdAndDelete(taskId);
     return res.status(200).json({
       message: "Task deleted successfully",
@@ -91,11 +86,12 @@ exports.deleteTask = async (req, res) => {
     });
   }
 };
-exports.updateTaskByName = async (req, res) => {
+
+exports.updateTaskById = async (req, res) => {
   try {
-    const taskName = req.params.taskName;
+    const taskId = req.params.taskId;
     const updatePayload = req.body;
-    const existingTask = await Task.findOne({ taskName });
+    const existingTask = await Task.findById(taskId);
     if (!existingTask) {
       return res.status(404).json({
         message: "Task not found",
@@ -136,6 +132,47 @@ exports.fetchTaskByName = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       message: "Failed to fetch task",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateTaskStatusByName = async (req, res) => {
+  try {
+    const taskStatus = req.params.taskStatus;
+    const taskName = req.query.taskName;
+
+    if (!taskName) {
+      return res.status(400).json({
+        message: "taskName query parameter is required",
+      });
+    }
+
+    if (!["PENDING", "COMPLETED"].includes(taskStatus)) {
+      return res.status(400).json({
+        message: "Invalid task status",
+      });
+    }
+
+    const existingTask = await Task.findOne({ taskName });
+
+    if (!existingTask) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+
+    if (existingTask.status === taskStatus) {
+      return res.status(400).json({
+        message: "Task already has the same status",
+      });
+    }
+    existingTask.status = taskStatus;
+    const updatedTask = await existingTask.save();
+    return res.status(200).json(updatedTask);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to update task status",
       error: error.message,
     });
   }

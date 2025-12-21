@@ -18,11 +18,11 @@ export const createTask = (taskPayload: TaskFormType) => {
   return axiosClient.post<Task>("/add-list", taskPayload);
 };
 
-export const updateTaskByName = (
+export const updateTaskStatusByName = (
   taskName: string,
-  updatePayload: TaskFormType
+  status: "PENDING" | "COMPLETED"
 ) => {
-  return axiosClient.put<Task>(`/update/${taskName}`, updatePayload);
+  return axiosClient.put(`/update/${status}?taskName=${taskName}`, {});
 };
 
 export const deleteTaskById = (taskId: string) => {
@@ -31,4 +31,8 @@ export const deleteTaskById = (taskId: string) => {
 
 export const fetchTaskByName = (taskName: string) => {
   return axiosClient.get<Task>(`/list/${taskName}`);
+};
+
+export const updateTaskById = (taskId: string, updatePayload: TaskFormType) => {
+  return axiosClient.put<Task>(`/update/task/${taskId}`, updatePayload);
 };

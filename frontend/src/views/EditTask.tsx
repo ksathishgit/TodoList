@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import TaskForm from "../components/TaskForm";
-import { updateTaskByName } from "../controllers/taskController";
+import { updateTaskById } from "../controllers/taskController";
 import {
   validateTaskForm,
   hasErrors,
@@ -11,18 +11,13 @@ import { Task, TaskFormType } from "../types/tasks";
 import { TOAST_MESSAGES } from "../constants/messages";
 
 interface Props {
-  taskName: string;
+  taskId: string;
   task: Task;
   onUpdated: () => void;
   onCancel: () => void;
 }
 
-export default function EditTask({
-  taskName,
-  task,
-  onUpdated,
-  onCancel,
-}: Props) {
+export default function EditTask({ taskId, task, onUpdated, onCancel }: Props) {
   const [form, setForm] = useState<TaskFormType>({
     taskName: task.taskName,
     description: task.description,
@@ -67,7 +62,7 @@ export default function EditTask({
 
     try {
       setLoading(true);
-      await updateTaskByName(taskName, form);
+      await updateTaskById(taskId, form);
       toast.success("Task updated successfully");
       onUpdated();
     } catch {
