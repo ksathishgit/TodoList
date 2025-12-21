@@ -1,1 +1,3 @@
-node_modules/
+frontend/node_modules/
+backend/api-gateway/node_modules/
+backend/task-service/node_modules/

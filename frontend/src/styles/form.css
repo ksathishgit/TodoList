@@ -1,0 +1,82 @@
+.todo-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.todo-section-title {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    margin-bottom: 20px !important;
+}
+
+.MuiTableCell-head {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.todo-container {
+    width: 800px;
+    margin: 30px auto;
+}
+
+.todo-card {
+    background: #ffffff;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 6px;
+}
+
+.todo-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 16px;
+}
+
+.todo-form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.todo-form-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+}
+
+.todo-table-container {
+    margin-top: 10px;
+}
+
+.todo-loader {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.todo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.todo-primary-btn {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.todo-primary-btn:hover {
+    background-color: #1565c0;
+}
+
+.todo-no-data {
+    font-size: 16px;
+    font-weight: 500;
+    color: #757575;
+    padding: 20px;
+}
