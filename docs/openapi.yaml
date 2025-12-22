@@ -32,31 +32,42 @@ paths:
 
   /todolist/api/v1/user/list/all:
     get:
-      tags:
-        - Tasks
-      summary: Get all tasks
+      summary: Get all tasks with filtering, sorting and pagination
       parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [PENDING, COMPLETED]
+        - in: query
+          name: minEffort
+          schema:
+            type: integer
+        - in: query
+          name: maxEffort
+          schema:
+            type: integer
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            example: effort
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
         - in: query
           name: page
           schema:
             type: integer
         - in: query
-          name: size
+          name: limit
           schema:
             type: integer
-        - in: query
-          name: sort
-          schema:
-            type: string
       responses:
         "200":
-          description: List of tasks
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/TaskResponse"
+          description: Paginated task list
 
   /todolist/api/v1/user/list/{taskName}:
     get:
