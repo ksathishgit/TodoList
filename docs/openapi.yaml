@@ -33,6 +33,7 @@ paths:
   /todolist/api/v1/user/list/all:
     get:
       summary: Get all tasks with filtering, sorting and pagination
+      description: Fetch tasks with optional filtering, sorting, and pagination. By default, tasks with PENDING status are prioritized first, followed by COMPLETED tasks, and sorted by effort in descending order.
       parameters:
         - in: query
           name: status

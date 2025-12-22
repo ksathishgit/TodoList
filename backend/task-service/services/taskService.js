@@ -34,12 +34,11 @@ exports.fetchAllTasks = async (queryParams) => {
     status,
     minEffort,
     maxEffort,
-    sortBy = "effort",
-    sortOrder = "desc",
+    sortBy,
+    sortOrder,
     page = 1,
     limit = 10,
   } = queryParams;
-
   const filter = {};
   if (status) {
     filter.status = status;
@@ -49,20 +48,43 @@ exports.fetchAllTasks = async (queryParams) => {
     if (minEffort) filter.effort.$gte = Number(minEffort);
     if (maxEffort) filter.effort.$lte = Number(maxEffort);
   }
-  const sort = {};
-  sort[sortBy] = sortOrder === "asc" ? 1 : -1;
   const skip = (Number(page) - 1) * Number(limit);
-  const [tasks, total] = await Promise.all([
-    Task.find(filter).sort(sort).skip(skip).limit(Number(limit)),
+  let pipeline = [];
+  pipeline.push({ $match: filter });
+  if (!sortBy && !sortOrder) {
+    pipeline.push({
+      $addFields: {
+        statusPriority: {
+          $cond: [{ $eq: ["$status", "PENDING"] }, 0, 1],
+        },
+      },
+    });
+    pipeline.push({
+      $sort: {
+        statusPriority: 1,
+        effort: -1,
+      },
+    });
+  } else {
+    pipeline.push({
+      $sort: {
+        [sortBy]: sortOrder === "asc" ? 1 : -1,
+      },
+    });
+  }
+  pipeline.push({ $skip: skip });
+  pipeline.push({ $limit: Number(limit) });
+  const [tasks, totalCount] = await Promise.all([
+    Task.aggregate(pipeline),
     Task.countDocuments(filter),
   ]);
 
   return {
     data: tasks,
     pagination: {
-      totalRecords: total,
+      totalRecords: totalCount,
       currentPage: Number(page),
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(totalCount / limit),
       pageSize: Number(limit),
     },
   };
