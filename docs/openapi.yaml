@@ -1,0 +1,183 @@
+openapi: 3.0.0
+info:
+  title: Todo List API
+  description: REST APIs for Todo List Application
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5001
+    description: Local server
+
+tags:
+  - name: Tasks
+    description: Task management APIs
+
+paths:
+  /todolist/api/v1/user/add-list:
+    post:
+      tags:
+        - Tasks
+      summary: Create a new task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRequest"
+      responses:
+        "201":
+          description: Task created successfully
+        "400":
+          description: Validation error
+
+  /todolist/api/v1/user/list/all:
+    get:
+      tags:
+        - Tasks
+      summary: Get all tasks
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: size
+          schema:
+            type: integer
+        - in: query
+          name: sort
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TaskResponse"
+
+  /todolist/api/v1/user/list/{taskName}:
+    get:
+      tags:
+        - Tasks
+      summary: Get task by name
+      parameters:
+        - in: path
+          name: taskName
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Task details
+        "404":
+          description: Task not found
+
+  /todolist/api/v1/user/update/task/{taskId}:
+    put:
+      tags:
+        - Tasks
+      summary: Update task by ID
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRequest"
+      responses:
+        "200":
+          description: Task updated
+        "404":
+          description: Task not found
+
+  /todolist/api/v1/user/update/{taskStatus}:
+    put:
+      tags:
+        - Tasks
+      summary: Update task status by name
+      parameters:
+        - in: path
+          name: taskStatus
+          required: true
+          schema:
+            type: string
+            enum: [PENDING, COMPLETED]
+        - in: query
+          name: taskName
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Status updated
+        "400":
+          description: Invalid request
+
+  /todolist/api/v1/user/delete/{id}:
+    delete:
+      tags:
+        - Tasks
+      summary: Delete task by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Task deleted
+        "400":
+          description: Completed task cannot be deleted
+        "404":
+          description: Task not found
+
+components:
+  schemas:
+    TaskRequest:
+      type: object
+      required:
+        - taskName
+        - description
+        - startDate
+        - endDate
+        - effort
+        - status
+      properties:
+        taskName:
+          type: string
+          example: Learn React
+        description:
+          type: string
+          example: Learn React with hooks
+        startDate:
+          type: string
+          format: date
+          example: 2024-01-01
+        endDate:
+          type: string
+          format: date
+          example: 2024-01-05
+        effort:
+          type: integer
+          example: 5
+        status:
+          type: string
+          enum: [PENDING, COMPLETED]
+
+    TaskResponse:
+      allOf:
+        - $ref: "#/components/schemas/TaskRequest"
+        - type: object
+          properties:
+            _id:
+              type: string
+              example: 65a123abc456
