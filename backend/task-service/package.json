@@ -4,8 +4,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "cross-env NODE_ENV=test mocha --require test/setup/chai.js --recursive",
-    "coverage": "cross-env NODE_ENV=test nyc mocha --require test/setup/chai.js --recursive"
+    "test": "mocha --recursive --exit",
+    "coverage": "nyc npm test"
   },
   "nyc": {
     "include": [
