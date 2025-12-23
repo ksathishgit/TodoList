@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "set NODE_ENV=test && mocha \"test/**/*.test.js\"",
-    "coverage": "set NODE_ENV=test && nyc npm test"
+    "start": "node server.js",
+    "test": "cross-env NODE_ENV=test mocha --require test/setup/chai.js --recursive",
+    "coverage": "cross-env NODE_ENV=test nyc mocha --require test/setup/chai.js --recursive"
   },
   "nyc": {
     "include": [
@@ -36,12 +36,14 @@
   "devDependencies": {
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
-    "chai": "^6.2.1",
+    "chai": "^4.3.10",
     "chai-http": "^5.1.2",
+    "cross-env": "^10.1.0",
     "mocha": "^11.7.5",
     "mongodb-memory-server": "^11.0.0",
     "nyc": "^17.1.0",
     "sinon": "^21.0.1",
+    "sinon-chai": "^3.7.0",
     "supertest": "^7.1.4"
   }
 }
