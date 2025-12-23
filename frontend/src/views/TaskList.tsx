@@ -110,7 +110,7 @@ export default function TaskList({
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell align="center">Status</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -136,10 +136,10 @@ export default function TaskList({
               tasks.map((task) => (
                 <TableRow key={task._id}>
                   <TableCell>{task.taskName}</TableCell>
-                  <TableCell align="center">
+                  <TableCell>
                     {task.status}
                     {task.status !== "COMPLETED" && (
-                      <div className="todo-status-action">
+                      <span className="todo-status-action">
                         {updatingTaskName === task.taskName ? (
                           <CircularProgress size={16} />
                         ) : (
@@ -154,7 +154,7 @@ export default function TaskList({
                             Mark as complete
                           </Link>
                         )}
-                      </div>
+                      </span>
                     )}
                   </TableCell>
                   <TableCell align="center">
